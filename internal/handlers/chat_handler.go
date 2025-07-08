@@ -124,8 +124,8 @@ func (h *ChatHandler) processChat(ctx context.Context, req *models.ChatRequest) 
 		return nil, fmt.Errorf("failed to add message to thread: %w", err)
 	}
 
-	// Run the thread with the specified model
-	response, err := h.openaiClient.RunThread(ctx, thread.ThreadID, req.Context.AgentConfig.AIProvider)
+	// Run the thread with the specified model (using default model from config)
+	response, err := h.openaiClient.RunThread(ctx, thread.ThreadID, h.cfg.DefaultModel)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run thread: %w", err)
 	}
@@ -137,7 +137,7 @@ func (h *ChatHandler) processChat(ctx context.Context, req *models.ChatRequest) 
 		ConversationID: thread.ThreadID, // Use thread ID as conversation ID
 		Status:         "success",
 		Metadata: models.ResponseMeta{
-			Model:      req.Context.AgentConfig.AIProvider,
+			Model:      h.cfg.DefaultModel,
 			TokensUsed: 0, // We don't track token usage in this implementation
 			Provider:   "chatgpt",
 			Cost:       0, // We don't track cost in this implementation
